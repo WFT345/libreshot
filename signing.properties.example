@@ -1,0 +1,5 @@
+# Release signing config for the release build. Copy to signing.properties and fill in.
+storeFile=libreshot-release.keystore
+storePassword=
+keyAlias=libreshot
+keyPassword=

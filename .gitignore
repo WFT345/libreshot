@@ -1,0 +1,20 @@
+# Build
+build/
+**/build/
+.local.properties
+local.properties
+
+# IDE
+.idea/
+*.iml
+.cxx/
+
+# Gradle
+.gradle/
+
+# Test artifacts
+.testshots/
+
+# Signing - never commit real keys
+signing.properties
+*.keystore

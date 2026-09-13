@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:name=".LibreShotApp"
+        android:label="@string/app_name"
+        android:icon="@mipmap/ic_launcher"
+        android:theme="@style/Theme.LibreShot"
+        android:allowBackup="false"
+        android:supportsRtl="true">
+
+        <activity
+            android:name=".capture.CaptureActivity"
+            android:exported="true"
+            android:theme="@style/Theme.LibreShot.Translucent"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:launchMode="singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+        </activity>
+
+        <activity
+            android:name=".editor.EditorActivity"
+            android:exported="false"
+            android:launchMode="singleTask" />
+
+        <activity
+            android:name=".settings.SettingsActivity"
+            android:exported="true" />
+
+        <activity
+            android:name=".onboarding.OnboardingActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".share.CopyActivity"
+            android:exported="false"
+            android:theme="@style/Theme.LibreShot.Translucent"
+            android:excludeFromRecents="true"
+            android:noHistory="true" />
+
+        <activity-alias
+            android:name=".share.CopyTarget"
+            android:targetActivity=".share.CopyActivity"
+            android:label="@string/copy"
+            android:exported="false" />
+        <activity-alias
+            android:name=".share.CopyDeleteTarget"
+            android:targetActivity=".share.CopyActivity"
+            android:label="@string/copy_and_delete"
+            android:exported="false" />
+
+        <service
+            android:name=".capture.CaptureService"
+            android:exported="false"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            android:label="@string/service_label">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_config" />
+        </service>
+
+        <service
+            android:name=".capture.CaptureTile"
+            android:exported="true"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
+            android:label="@string/app_name"
+            android:icon="@drawable/ic_tile">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <receiver android:name=".share.ShareResultReceiver" android:exported="false" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+    </application>
+</manifest>

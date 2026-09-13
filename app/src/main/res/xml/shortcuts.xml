@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="settings"
+        android:enabled="true"
+        android:icon="@drawable/ic_tile"
+        android:shortcutShortLabel="@string/settings"
+        android:shortcutLongLabel="@string/settings">
+        <intent
+            android:action="android.intent.action.MAIN"
+            android:targetPackage="app.libreshot"
+            android:targetClass="app.libreshot.settings.SettingsActivity" />
+    </shortcut>
+</shortcuts>
