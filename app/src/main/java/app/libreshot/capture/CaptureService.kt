@@ -33,7 +33,6 @@ class CaptureService : AccessibilityService() {
         var instance: CaptureService? = null
             private set
 
-        private const val MIN_INTERVAL_MS = 400L
         // Give SurfaceFlinger a few frames to drop our overlay before it composites the capture.
         private const val SETTLE_AFTER_HIDE_MS = 100L
     }
@@ -41,9 +40,9 @@ class CaptureService : AccessibilityService() {
     private val handler = Handler(Looper.getMainLooper())
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val chordDetector = KeyChordDetector()
+    private val rateLimiter = RateLimiter(windowMs = 400L)
     private var overlay: ThumbnailOverlay? = null
     private var prefs = PrefsSnapshot()
-    private var lastCaptureAt = 0L
 
     override fun onServiceConnected() {
         instance = this
@@ -74,16 +73,14 @@ class CaptureService : AccessibilityService() {
     override fun onInterrupt() = Unit
 
     override fun onKeyEvent(event: KeyEvent): Boolean {
-        if (!prefs.volumeChord || event.keyCode != KeyEvent.KEYCODE_VOLUME_DOWN) {
-            return super.onKeyEvent(event)
-        }
+        if (!prefs.volumeChord) return super.onKeyEvent(event)
         if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0 &&
             chordDetector.onKeyDown(event.keyCode, event.eventTime)
         ) {
             requestCapture(CaptureSource.CHORD)
         }
-        // Swallow both presses so volume never changes while the chord is enabled.
-        return true
+        // Swallow volume-down so the chord never changes volume; everything else passes.
+        return if (event.keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) true else super.onKeyEvent(event)
     }
 
     fun requestCapture(source: CaptureSource, delayMs: Long = 0L) {
@@ -91,9 +88,7 @@ class CaptureService : AccessibilityService() {
     }
 
     private fun capture(source: CaptureSource) {
-        val now = SystemClock.uptimeMillis()
-        if (now - lastCaptureAt < MIN_INTERVAL_MS) return
-        lastCaptureAt = now
+        if (!rateLimiter.allow(SystemClock.uptimeMillis())) return
 
         val overlayWasShowing = overlay?.isShowing == true
         overlay?.hide()

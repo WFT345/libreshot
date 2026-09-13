@@ -215,6 +215,8 @@ class ThumbnailOverlay(private val service: CaptureService) {
                 MotionEvent.ACTION_DOWN -> {
                     interacting = true
                     xAnimator?.cancel()
+                    pendingHide?.let { handler.removeCallbacks(it) }
+                    pendingHide = null
                     dragging = false
                     downRawX = event.rawX
                     lastRawX = event.rawX
