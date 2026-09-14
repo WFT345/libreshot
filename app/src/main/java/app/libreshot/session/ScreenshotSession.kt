@@ -3,7 +3,7 @@ package app.libreshot.session
 import android.graphics.Bitmap
 import app.libreshot.editor.model.EditStack
 
-enum class CaptureSource { QUICK_TAP, TILE, CHORD }
+enum class CaptureSource { QUICK_TAP, TILE, CHORD, BACK_TAP }
 
 class ScreenshotSession(
     val id: String,

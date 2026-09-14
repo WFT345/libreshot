@@ -17,6 +17,7 @@ data class PrefsSnapshot(
     val cornerLeft: Boolean = true,
     val haptic: Boolean = true,
     val volumeChord: Boolean = false,
+    val backTap: Boolean = false,
     val onboarded: Boolean = false,
 )
 
@@ -27,6 +28,7 @@ object Prefs {
     private val CORNER_LEFT = booleanPreferencesKey("corner_left")
     private val HAPTIC = booleanPreferencesKey("haptic")
     private val VOLUME_CHORD = booleanPreferencesKey("volume_chord")
+    private val BACK_TAP = booleanPreferencesKey("back_tap")
     private val ONBOARDED = booleanPreferencesKey("onboarded")
 
     fun flow(context: Context): Flow<PrefsSnapshot> = context.dataStore.data.map { p ->
@@ -36,6 +38,7 @@ object Prefs {
             cornerLeft = p[CORNER_LEFT] ?: true,
             haptic = p[HAPTIC] ?: true,
             volumeChord = p[VOLUME_CHORD] ?: false,
+            backTap = p[BACK_TAP] ?: false,
             onboarded = p[ONBOARDED] ?: false,
         )
     }
@@ -56,6 +59,9 @@ object Prefs {
 
     suspend fun setVolumeChord(context: Context, value: Boolean) =
         context.dataStore.edit { it[VOLUME_CHORD] = value }
+
+    suspend fun setBackTap(context: Context, value: Boolean) =
+        context.dataStore.edit { it[BACK_TAP] = value }
 
     suspend fun setOnboarded(context: Context, value: Boolean) =
         context.dataStore.edit { it[ONBOARDED] = value }
