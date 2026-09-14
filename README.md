@@ -27,6 +27,8 @@ MVP differs from it.
 - The accessibility service requests only `canTakeScreenshot` (and
   `canRequestFilterKeyEvents` for the optional volume chord). It cannot read window
   content.
+- The optional back-tap trigger reads the accelerometer only while the screen is
+  on and the toggle is enabled. No motion data is stored or leaves the process.
 - No analytics, no crash SDKs, no Play Services.
 
 ## Setup
@@ -35,8 +37,10 @@ MVP differs from it.
 2. Enable **LibreShot capture** under Settings → Accessibility → Downloaded/Installed
    apps.
 3. Trigger:
-   - **Pixel / GrapheneOS:** Settings → System → Gestures → Quick Tap → Open app →
-     LibreShot. Double-tap the back of the phone.
+   - **Any device:** enable **Back-tap capture** in LibreShot settings and
+     double-tap the back of the phone.
+   - **Stock Pixel:** Settings → System → Gestures → Quick Tap → Open app →
+     LibreShot (GrapheneOS/AOSP builds don't ship Quick Tap - use back-tap).
    - **Others (e.g. Samsung):** add the LibreShot tile to Quick Settings and tap it.
    - Optional: volume-down double-press chord (Settings inside the app).
 
