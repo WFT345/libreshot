@@ -23,6 +23,8 @@ class EditorActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // This window is the captured screenshot; the system would persist it as a Recents thumbnail.
+        setRecentsScreenshotEnabled(false)
         val session = intent.getStringExtra(EXTRA_SESSION_ID)?.let(SessionStore::get)
         if (session == null) {
             Toast.makeText(this, R.string.session_gone, Toast.LENGTH_SHORT).show()

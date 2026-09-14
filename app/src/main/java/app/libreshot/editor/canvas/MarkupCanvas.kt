@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -27,8 +28,13 @@ import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import app.libreshot.editor.model.CropHandle
+import app.libreshot.editor.model.CropRect
 import app.libreshot.editor.model.Stroke
 import app.libreshot.editor.model.Tool
+import app.libreshot.editor.overlay.CropOverlay
+import app.libreshot.editor.overlay.cropRectOnScreen
+import app.libreshot.editor.overlay.hitTestCropHandle
 import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -36,20 +42,26 @@ import kotlin.math.roundToInt
 private const val MAX_ZOOM = 4f
 
 /**
- * One finger draws with the active tool, two fingers always pan/zoom (cancelling any stroke
- * in progress), three-finger horizontal swipe is undo/redo.
+ * One finger draws with the active tool - unless the down lands on a crop handle, in which
+ * case it drags the crop rect. Two fingers always pan/zoom (cancelling any stroke or crop
+ * drag in progress), three-finger horizontal swipe is undo/redo.
  */
 @Composable
 fun MarkupCanvas(
     bitmap: Bitmap,
     strokes: List<Stroke>,
     liveStroke: Stroke?,
+    crop: CropRect,
     tool: Tool,
     onBeginStroke: (at: Offset, widthPx: Float) -> Unit,
     onExtendStroke: (at: Offset) -> Unit,
     onEndStroke: () -> Unit,
     onCancelStroke: () -> Unit,
     onErase: (at: Offset, tolerancePx: Float) -> Unit,
+    onBeginCropDrag: () -> Unit,
+    onDragCrop: (handle: CropHandle, toNormalized: Offset) -> Unit,
+    onEndCropDrag: () -> Unit,
+    onCancelCropDrag: () -> Unit,
     onUndo: () -> Unit,
     onRedo: () -> Unit,
 ) {
@@ -64,14 +76,27 @@ fun MarkupCanvas(
         )
         var zoom by remember { mutableStateOf(1f) }
         var pan by remember { mutableStateOf(Offset.Zero) }
+        var cropDragging by remember { mutableStateOf(false) }
         val image = remember { bitmap.asImageBitmap() }
+        // Read inside the gesture loop so crop changes don't restart pointerInput mid-drag.
+        val currentCrop by rememberUpdatedState(crop)
 
         val eraseTolerancePx = with(density) { 12.dp.toPx() }
+        val cornerTouchPx = with(density) { 28.dp.toPx() }
+        val edgeBandPx = with(density) { 14.dp.toPx() }
 
         fun screenToBitmap(p: Offset): Offset = Offset(
             ((p.x - pan.x) / zoom - origin.x) / fitScale,
             ((p.y - pan.y) / zoom - origin.y) / fitScale,
         )
+
+        fun screenToNormalized(p: Offset): Offset {
+            val b = screenToBitmap(p)
+            return Offset(
+                (b.x / bitmap.width).coerceIn(0f, 1f),
+                (b.y / bitmap.height).coerceIn(0f, 1f),
+            )
+        }
 
         fun widthPxFor(t: Tool): Float = with(density) {
             // The bitmap is captured at native resolution, so screen px == bitmap px.
@@ -109,11 +134,34 @@ fun MarkupCanvas(
                         var transforming = false
                         var threeFingerFired = false
                         var accPanX = 0f
-                        if (tool == Tool.ERASER) {
-                            onErase(screenToBitmap(down.position), eraseTolerancePx)
-                        } else {
-                            onBeginStroke(screenToBitmap(down.position), widthPxFor(tool))
-                            strokeActive = true
+                        var cropHandle = hitTestCropHandle(
+                            down.position,
+                            cropRectOnScreen(
+                                currentCrop,
+                                bitmap.width,
+                                bitmap.height,
+                                fitScale,
+                                origin,
+                                zoom,
+                                pan,
+                            ),
+                            cornerTouchPx,
+                            edgeBandPx,
+                        )
+                        when {
+                            cropHandle != null -> {
+                                onBeginCropDrag()
+                                cropDragging = true
+                            }
+
+                            tool == Tool.ERASER -> {
+                                onErase(screenToBitmap(down.position), eraseTolerancePx)
+                            }
+
+                            else -> {
+                                onBeginStroke(screenToBitmap(down.position), widthPxFor(tool))
+                                strokeActive = true
+                            }
                         }
                         while (true) {
                             val event = awaitPointerEvent()
@@ -123,6 +171,11 @@ fun MarkupCanvas(
                                     if (strokeActive) {
                                         onCancelStroke()
                                         strokeActive = false
+                                    }
+                                    if (cropHandle != null) {
+                                        onCancelCropDrag()
+                                        cropHandle = null
+                                        cropDragging = false
                                     }
                                     accPanX += event.calculatePan().x
                                     if (!threeFingerFired && abs(accPanX) > threeFingerThreshold) {
@@ -136,6 +189,11 @@ fun MarkupCanvas(
                                     if (strokeActive) {
                                         onCancelStroke()
                                         strokeActive = false
+                                    }
+                                    if (cropHandle != null) {
+                                        onCancelCropDrag()
+                                        cropHandle = null
+                                        cropDragging = false
                                     }
                                     transforming = true
                                     transform(
@@ -151,6 +209,14 @@ fun MarkupCanvas(
                                     when {
                                         strokeActive -> if (change.positionChanged()) {
                                             onExtendStroke(screenToBitmap(change.position))
+                                            change.consume()
+                                        }
+
+                                        cropHandle != null -> if (change.positionChanged()) {
+                                            onDragCrop(
+                                                cropHandle!!,
+                                                screenToNormalized(change.position),
+                                            )
                                             change.consume()
                                         }
 
@@ -171,6 +237,8 @@ fun MarkupCanvas(
                             }
                             if (pressed.isEmpty()) {
                                 if (strokeActive) onEndStroke()
+                                if (cropHandle != null) onEndCropDrag()
+                                cropDragging = false
                                 break
                             }
                         }
@@ -203,5 +271,19 @@ fun MarkupCanvas(
                 liveStroke?.let { drawStroke(it, fitScale, origin) }
             }
         }
+
+        CropOverlay(
+            rect = cropRectOnScreen(
+                crop,
+                bitmap.width,
+                bitmap.height,
+                fitScale,
+                origin,
+                zoom,
+                pan,
+            ),
+            dimOutside = !crop.isFull,
+            showGrid = cropDragging,
+        )
     }
 }

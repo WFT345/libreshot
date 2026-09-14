@@ -15,6 +15,9 @@ local.properties
 # Test artifacts
 .testshots/
 
+# Obsidian vault (separate from the repo; see wiki/LibreShot.md)
+wiki/
+
 # Signing - never commit real keys
 signing.properties
 *.keystore

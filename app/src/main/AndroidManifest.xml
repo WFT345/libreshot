@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Lets resolveActivity() detect Quick Tap support under package-visibility filtering -->
+    <queries>
+        <intent>
+            <action android:name="android.settings.QUICK_TAP_GESTURE_SETTINGS" />
+        </intent>
+    </queries>
+
     <application
         android:name=".LibreShotApp"
         android:label="@string/app_name"

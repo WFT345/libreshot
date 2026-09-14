@@ -5,6 +5,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import app.libreshot.editor.model.CropHandle
+import app.libreshot.editor.model.CropRect
 import app.libreshot.editor.model.Stroke
 import app.libreshot.editor.model.Tool
 import app.libreshot.editor.model.hitTestStroke
@@ -41,11 +43,15 @@ class EditorViewModel(private val session: ScreenshotSession) : ViewModel() {
     private val _hasEdits = MutableStateFlow(false)
     val hasEdits: StateFlow<Boolean> = _hasEdits
 
+    private val _crop = MutableStateFlow(edits.crop)
+    val crop: StateFlow<CropRect> = _crop
+
     val tool = MutableStateFlow(Tool.PEN)
     val color = MutableStateFlow(Color.Black)
 
     private var activePoints: MutableList<Offset>? = null
     private var activeWidthPx = 0f
+    private var cropDragStart: CropRect? = null
 
     fun setTool(value: Tool) {
         tool.value = value
@@ -90,6 +96,30 @@ class EditorViewModel(private val session: ScreenshotSession) : ViewModel() {
         sync()
     }
 
+    /** Starts a crop-handle drag; moves are absolute against the pre-drag rect. */
+    fun beginCropDrag() {
+        cropDragStart = _crop.value
+    }
+
+    fun dragCrop(handle: CropHandle, toNormalized: Offset) {
+        val start = cropDragStart ?: return
+        _crop.value = start.dragged(handle, toNormalized.x, toNormalized.y)
+    }
+
+    fun endCropDrag() {
+        val start = cropDragStart ?: return
+        cropDragStart = null
+        if (_crop.value != start) {
+            edits.setCrop(_crop.value)
+            sync()
+        }
+    }
+
+    fun cancelCropDrag() {
+        cropDragStart?.let { _crop.value = it }
+        cropDragStart = null
+    }
+
     fun undo() {
         edits.undo()
         sync()
@@ -110,6 +140,7 @@ class EditorViewModel(private val session: ScreenshotSession) : ViewModel() {
 
     private fun sync() {
         _strokes.value = edits.strokes
+        _crop.value = edits.crop
         _canUndo.value = edits.canUndo
         _canRedo.value = edits.canRedo
         _hasEdits.value = edits.hasEdits

@@ -24,7 +24,7 @@ object ShareHelper {
         val appContext = context.applicationContext
         thread(name = "share-export") {
             val bitmap =
-                if (edited) Compositor.render(session.bitmap, session.edits.strokes)
+                if (edited) Compositor.render(session.bitmap, session.edits.strokes, session.edits.crop)
                 else session.bitmap
             val dir = File(appContext.cacheDir, "share").apply { mkdirs() }
             dir.listFiles()?.forEach { it.delete() }

@@ -30,7 +30,11 @@ class CopyActivity : ComponentActivity() {
         val deleteAfter = intent.getBooleanExtra(EXTRA_DELETE, false)
         lifecycleScope.launch {
             val copied = withContext(Dispatchers.Default) {
-                val composite = Compositor.render(session.bitmap, session.edits.strokes)
+                val composite = Compositor.render(
+                    session.bitmap,
+                    session.edits.strokes,
+                    session.edits.crop,
+                )
                 ClipboardCopier.copy(applicationContext, composite, session.id)
             }
             if (copied) {

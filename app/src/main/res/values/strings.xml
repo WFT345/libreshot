@@ -47,6 +47,14 @@
     <string name="onboarding_service_off">Service not enabled yet</string>
     <string name="onboarding_trigger_title">Trigger a capture</string>
     <string name="onboarding_trigger_pixel">Settings → System → Gestures → Quick Tap → Open app → LibreShot. Double-tap the back of the phone to capture.</string>
-    <string name="onboarding_trigger_generic">This device has no Quick Tap gesture. Add the LibreShot tile to Quick Settings (edit the tiles panel) and tap it to capture.</string>
-    <string name="onboarding_continue">Continue</string>
+    <string name="onboarding_trigger_aosp">This build has no Quick Tap gesture. Instead: add the LibreShot tile to Quick Settings (edit the tiles panel), or enable “Volume-down double-press” in LibreShot settings.</string>
+    <string name="onboarding_trigger_generic">This device has no Quick Tap gesture. Instead: add the LibreShot tile to Quick Settings (edit the tiles panel), enable “Volume-down double-press” in LibreShot settings, or set the side key’s double-press to open LibreShot (Settings → Advanced features → Side key).</string>
+    <string name="onboarding_intro_body">Capture with a tap, peek at a corner thumbnail, mark it up, then copy or save. Nothing touches your gallery unless you choose Save.</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_start">Start capturing</string>
+    <string name="onboarding_enable_first">Enable the service</string>
+    <string name="onboarding_ready_title">You’re set</string>
+    <string name="onboarding_ready_body">Optional extras live in Settings: the volume-down capture chord, thumbnail duration and corner, and haptics.</string>
+    <string name="onboarding_open_settings">Open Settings</string>
 </resources>

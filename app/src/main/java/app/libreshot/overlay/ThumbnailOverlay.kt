@@ -133,7 +133,15 @@ class ThumbnailOverlay(private val service: CaptureService) {
             FLAG_NOT_TOUCHABLE or FLAG_NOT_FOCUSABLE or FLAG_LAYOUT_IN_SCREEN,
             PixelFormat.TRANSLUCENT,
         )
-        windowManager.addView(view, params)
+        // A throw here would crash the accessibility service, which the user must then re-enable by hand.
+        try {
+            windowManager.addView(view, params)
+        } catch (e: RuntimeException) {
+            owner.destroy()
+            flashHost = null
+            flashOwner = null
+            return
+        }
         owner.onWindowShown()
         flashHost = view
         flashOwner = owner
@@ -169,7 +177,15 @@ class ThumbnailOverlay(private val service: CaptureService) {
             x = geom.windowRestX
             y = geom.windowY
         }
-        windowManager.addView(view, params)
+        try {
+            windowManager.addView(view, params)
+        } catch (e: RuntimeException) {
+            owner.destroy()
+            thumbHost = null
+            thumbOwner = null
+            thumbParams = null
+            return
+        }
         owner.onWindowShown()
         thumbHost = view
         thumbOwner = owner
@@ -350,14 +366,25 @@ class ThumbnailOverlay(private val service: CaptureService) {
     }
 
     private fun removeFlashWindow() {
-        flashHost?.let { windowManager.removeViewImmediate(it) }
+        // "View not attached" must not abort the rest of teardown.
+        flashHost?.let {
+            try {
+                windowManager.removeViewImmediate(it)
+            } catch (e: RuntimeException) {
+            }
+        }
         flashOwner?.destroy()
         flashHost = null
         flashOwner = null
     }
 
     private fun removeThumbWindow() {
-        thumbHost?.let { windowManager.removeViewImmediate(it) }
+        thumbHost?.let {
+            try {
+                windowManager.removeViewImmediate(it)
+            } catch (e: RuntimeException) {
+            }
+        }
         thumbOwner?.destroy()
         thumbHost = null
         thumbOwner = null

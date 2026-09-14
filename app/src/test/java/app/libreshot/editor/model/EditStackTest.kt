@@ -70,4 +70,54 @@ class EditStackTest {
         assertTrue(stack.strokes.isEmpty())
         assertFalse(stack.canUndo)
     }
+
+    @Test
+    fun `crop pushes history and undoes back to full`() {
+        val stack = EditStack()
+        val crop = CropRect(0.1f, 0.1f, 0.9f, 0.9f)
+        stack.setCrop(crop)
+
+        assertEquals(crop, stack.crop)
+        assertTrue(stack.hasEdits)
+        assertTrue(stack.canUndo)
+
+        stack.undo()
+        assertEquals(CropRect.FULL, stack.crop)
+        assertFalse(stack.hasEdits)
+
+        stack.redo()
+        assertEquals(crop, stack.crop)
+    }
+
+    @Test
+    fun `crop and strokes share one undo timeline`() {
+        val stack = EditStack()
+        val a = stroke(1f)
+        stack.addStroke(a)
+        val crop = CropRect(0.2f, 0f, 1f, 1f)
+        stack.setCrop(crop)
+
+        stack.undo()
+        assertEquals(CropRect.FULL, stack.crop)
+        assertEquals(listOf(a), stack.strokes)
+        assertTrue(stack.hasEdits)
+
+        stack.undo()
+        assertTrue(stack.strokes.isEmpty())
+        assertFalse(stack.hasEdits)
+    }
+
+    @Test
+    fun `setting the same crop twice is a no-op`() {
+        val stack = EditStack()
+        stack.setCrop(CropRect.FULL)
+        assertFalse(stack.canUndo)
+
+        val crop = CropRect(0.1f, 0f, 1f, 1f)
+        stack.setCrop(crop)
+        stack.setCrop(crop)
+        stack.undo()
+        assertEquals(CropRect.FULL, stack.crop)
+        assertFalse(stack.canUndo)
+    }
 }

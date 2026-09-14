@@ -6,17 +6,20 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
 import androidx.compose.ui.graphics.toArgb
+import app.libreshot.editor.model.CropRect
 import app.libreshot.editor.model.Stroke
 import app.libreshot.editor.model.Tool
 
-/** Renders the final composite: original capture plus markup, in bitmap space. */
+/** Renders the final composite: original capture plus markup, then crop, in bitmap space. */
 object Compositor {
 
-    fun render(original: Bitmap, strokes: List<Stroke>): Bitmap {
+    fun render(original: Bitmap, strokes: List<Stroke>, crop: CropRect = CropRect.FULL): Bitmap {
         val out = original.copy(Bitmap.Config.ARGB_8888, true)
         val canvas = Canvas(out)
         strokes.forEach { drawStroke(canvas, it) }
-        return out
+        val px = crop.toPixelRect(original.width, original.height)
+        if (px.isFull(original.width, original.height)) return out
+        return Bitmap.createBitmap(out, px.left, px.top, px.width, px.height)
     }
 
     private fun drawStroke(canvas: Canvas, stroke: Stroke) {
