@@ -2,6 +2,7 @@ package app.libreshot.settings
 
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -18,6 +19,7 @@ data class PrefsSnapshot(
     val haptic: Boolean = true,
     val volumeChord: Boolean = false,
     val backTap: Boolean = false,
+    val backTapThreshold: Float = 10f,
     val onboarded: Boolean = false,
 )
 
@@ -29,6 +31,7 @@ object Prefs {
     private val HAPTIC = booleanPreferencesKey("haptic")
     private val VOLUME_CHORD = booleanPreferencesKey("volume_chord")
     private val BACK_TAP = booleanPreferencesKey("back_tap")
+    private val BACK_TAP_THRESHOLD = floatPreferencesKey("back_tap_threshold")
     private val ONBOARDED = booleanPreferencesKey("onboarded")
 
     fun flow(context: Context): Flow<PrefsSnapshot> = context.dataStore.data.map { p ->
@@ -39,6 +42,7 @@ object Prefs {
             haptic = p[HAPTIC] ?: true,
             volumeChord = p[VOLUME_CHORD] ?: false,
             backTap = p[BACK_TAP] ?: false,
+            backTapThreshold = p[BACK_TAP_THRESHOLD] ?: 10f,
             onboarded = p[ONBOARDED] ?: false,
         )
     }
@@ -62,6 +66,9 @@ object Prefs {
 
     suspend fun setBackTap(context: Context, value: Boolean) =
         context.dataStore.edit { it[BACK_TAP] = value }
+
+    suspend fun setBackTapThreshold(context: Context, value: Float) =
+        context.dataStore.edit { it[BACK_TAP_THRESHOLD] = value }
 
     suspend fun setOnboarded(context: Context, value: Boolean) =
         context.dataStore.edit { it[ONBOARDED] = value }

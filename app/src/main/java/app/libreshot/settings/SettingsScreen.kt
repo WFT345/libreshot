@@ -89,6 +89,17 @@ fun SettingsScreen(onClose: () -> Unit) {
                 summary = stringResource(R.string.settings_back_tap_summary),
                 checked = prefs.backTap,
             ) { scope.launch { Prefs.setBackTap(context, it) } }
+            if (prefs.backTap) {
+                ChoiceRow(
+                    title = stringResource(R.string.settings_back_tap_sensitivity),
+                    options = listOf(
+                        stringResource(R.string.settings_sensitivity_high) to 6f,
+                        stringResource(R.string.settings_sensitivity_medium) to 10f,
+                        stringResource(R.string.settings_sensitivity_low) to 15f,
+                    ),
+                    selected = prefs.backTapThreshold,
+                ) { scope.launch { Prefs.setBackTapThreshold(context, it) } }
+            }
             ToggleRow(
                 title = stringResource(R.string.settings_volume_chord),
                 summary = stringResource(R.string.settings_volume_chord_summary),

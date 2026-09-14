@@ -15,7 +15,7 @@ import kotlin.math.abs
  * [onSpike] exists for on-device threshold tuning via logcat; pass null in release.
  */
 class BackTapDetector(
-    private val threshold: Float = 2.5f,
+    private val threshold: Float = 10f,
     private val minGapMs: Long = 80L,
     private val maxGapMs: Long = 400L,
     private val spikeDeadMs: Long = 60L,

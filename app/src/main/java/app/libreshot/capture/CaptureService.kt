@@ -62,6 +62,7 @@ class CaptureService : AccessibilityService() {
                 prefs = value
                 overlay.prefs = value
                 if (chordToggled) applyKeyEventFilter()
+                backTapMonitor?.setThreshold(value.backTapThreshold)
                 backTapMonitor?.setEnabled(value.backTap)
             }
         }

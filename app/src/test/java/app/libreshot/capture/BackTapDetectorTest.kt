@@ -34,7 +34,7 @@ class BackTapDetectorTest {
 
     @Test
     fun `clean pair fires on the second tap`() {
-        val d = BackTapDetector()
+        val d = BackTapDetector(threshold = 2.5f)
         val t = warmUp(d)
         assertFalse(tap(d, t))
         assertTrue(tap(d, t + 200))
@@ -42,14 +42,14 @@ class BackTapDetectorTest {
 
     @Test
     fun `single tap does not fire`() {
-        val d = BackTapDetector()
+        val d = BackTapDetector(threshold = 2.5f)
         val t = warmUp(d)
         assertFalse(tap(d, t))
     }
 
     @Test
     fun `pair slower than the window does not fire but re-arms`() {
-        val d = BackTapDetector()
+        val d = BackTapDetector(threshold = 2.5f)
         val t = warmUp(d)
         assertFalse(tap(d, t))
         assertFalse(tap(d, t + 600))
@@ -59,7 +59,7 @@ class BackTapDetectorTest {
     @Test
     fun `taps closer than the minimum gap disarm`() {
         // 75 ms gap: outside the 60 ms spike-grouping window, inside the 80 ms minimum.
-        val d = BackTapDetector()
+        val d = BackTapDetector(threshold = 2.5f)
         val t = warmUp(d)
         assertFalse(d.onSample(t, 0f, 0f, g + 4f))
         assertFalse(d.onSample(t + 75, 0f, 0f, g + 4f))
@@ -71,7 +71,7 @@ class BackTapDetectorTest {
 
     @Test
     fun `sustained vibration never fires`() {
-        val d = BackTapDetector()
+        val d = BackTapDetector(threshold = 2.5f)
         var t = warmUp(d)
         repeat(400) { // 2 s of every-sample super-threshold buzz
             assertFalse(d.onSample(t, 0f, 0f, g + 4f))
@@ -81,7 +81,7 @@ class BackTapDetectorTest {
 
     @Test
     fun `sideways bump does not arm`() {
-        val d = BackTapDetector()
+        val d = BackTapDetector(threshold = 2.5f)
         val t = warmUp(d)
         // x-dominant spike (side knock): must not count as a tap…
         assertFalse(d.onSample(t, 6f, 0f, g + 1f))
@@ -91,7 +91,7 @@ class BackTapDetectorTest {
 
     @Test
     fun `cooldown suppresses an immediate second pair`() {
-        val d = BackTapDetector()
+        val d = BackTapDetector(threshold = 2.5f)
         val t = warmUp(d)
         tap(d, t)
         assertTrue(tap(d, t + 200))
@@ -103,8 +103,22 @@ class BackTapDetectorTest {
     }
 
     @Test
+    fun `default threshold ignores incidental knocks and needs a firm tap`() {
+        // Measured on a Pixel 10 Pro XL: idle handling peaks near 3 m/s², taps read 6-14.
+        val soft = BackTapDetector()
+        val tSoft = warmUp(soft)
+        assertFalse(tap(soft, tSoft, amplitude = 4f))
+        assertFalse(tap(soft, tSoft + 200, amplitude = 4f))
+
+        val firm = BackTapDetector()
+        val tFirm = warmUp(firm)
+        assertFalse(tap(firm, tFirm, amplitude = 14f))
+        assertTrue(tap(firm, tFirm + 200, amplitude = 14f))
+    }
+
+    @Test
     fun `sub-threshold wiggle never fires`() {
-        val d = BackTapDetector()
+        val d = BackTapDetector(threshold = 2.5f)
         var t = warmUp(d)
         repeat(100) {
             assertFalse(d.onSample(t, 0f, 0f, g + 1.5f))
