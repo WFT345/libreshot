@@ -2,6 +2,7 @@ package app.libreshot.capture
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
+import android.app.KeyguardManager
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Handler
@@ -41,6 +42,7 @@ class CaptureService : AccessibilityService() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val chordDetector = KeyChordDetector()
     private val rateLimiter = RateLimiter(windowMs = 400L)
+    private var backTapMonitor: BackTapMonitor? = null
     private var overlay: ThumbnailOverlay? = null
     private var prefs = PrefsSnapshot()
 
@@ -48,18 +50,27 @@ class CaptureService : AccessibilityService() {
         instance = this
         val overlay = ThumbnailOverlay(this)
         this.overlay = overlay
+        backTapMonitor = BackTapMonitor(this) {
+            // Screenshot-on-lockscreen is deliberately excluded from back-tap.
+            if (getSystemService(KeyguardManager::class.java)?.isKeyguardLocked != true) {
+                requestCapture(CaptureSource.BACK_TAP)
+            }
+        }
         scope.launch {
             Prefs.flow(this@CaptureService).collect { value ->
                 val chordToggled = value.volumeChord != prefs.volumeChord
                 prefs = value
                 overlay.prefs = value
                 if (chordToggled) applyKeyEventFilter()
+                backTapMonitor?.setEnabled(value.backTap)
             }
         }
         CaptureTile.requestListening(this)
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
+        backTapMonitor?.destroy()
+        backTapMonitor = null
         overlay?.destroy()
         overlay = null
         instance = null
