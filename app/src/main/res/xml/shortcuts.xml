@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
     <shortcut
-        android:shortcutId="settings"
+        android:shortcutId="capture"
         android:enabled="true"
         android:icon="@drawable/ic_tile"
-        android:shortcutShortLabel="@string/settings"
-        android:shortcutLongLabel="@string/settings">
+        android:shortcutShortLabel="@string/shortcut_capture"
+        android:shortcutLongLabel="@string/shortcut_capture">
         <intent
             android:action="android.intent.action.MAIN"
             android:targetPackage="app.libreshot"
-            android:targetClass="app.libreshot.settings.SettingsActivity" />
+            android:targetClass="app.libreshot.capture.CaptureActivity">
+            <extra android:name="app.libreshot.extra.SOURCE" android:value="QUICK_TAP" />
+        </intent>
     </shortcut>
 </shortcuts>

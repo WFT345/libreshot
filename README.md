@@ -43,6 +43,8 @@ MVP differs from it.
      LibreShot (GrapheneOS/AOSP builds don't ship Quick Tap - use back-tap).
    - **Others (e.g. Samsung):** add the LibreShot tile to Quick Settings and tap it.
    - Optional: volume-down double-press chord (Settings inside the app).
+   - Tapping the LibreShot icon opens Settings; long-press the icon for a
+     Capture shortcut.
 
 ## Build
 

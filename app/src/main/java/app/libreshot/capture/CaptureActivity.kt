@@ -5,10 +5,13 @@ import android.content.Intent
 import android.os.Bundle
 import app.libreshot.onboarding.OnboardingActivity
 import app.libreshot.session.CaptureSource
+import app.libreshot.settings.SettingsActivity
 
 /**
- * Transparent trampoline that Quick Tap (Pixel "Open app") and the Quick Settings tile launch.
- * The window is invisible and lives for a few milliseconds.
+ * Transparent trampoline behind the launcher icon. The QS tile and the long-press
+ * shortcut (via [EXTRA_SOURCE]) and SystemUI launches (Quick Tap, side key) trigger
+ * a capture; a plain icon tap opens Settings. The window is invisible and lives for
+ * a few milliseconds.
  */
 class CaptureActivity : Activity() {
 
@@ -24,14 +27,23 @@ class CaptureActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val service = CaptureService.instance
-        if (service == null) {
-            startActivity(Intent(this, OnboardingActivity::class.java))
-        } else {
-            val source = intent.getStringExtra(EXTRA_SOURCE)
-                ?.let { name -> CaptureSource.entries.firstOrNull { it.name == name } }
-                ?: CaptureSource.QUICK_TAP
-            service.requestCapture(source, clampDelay(intent.getLongExtra(EXTRA_DELAY_MS, 0L)))
+        val sourceName = intent.getStringExtra(EXTRA_SOURCE)
+        when (LaunchRouter.decide(
+            serviceRunning = CaptureService.instance != null,
+            hasSourceExtra = sourceName != null,
+            referrerHost = referrer?.host,
+        )) {
+            LaunchRouter.Action.ONBOARDING ->
+                startActivity(Intent(this, OnboardingActivity::class.java))
+            LaunchRouter.Action.OPEN_SETTINGS ->
+                startActivity(Intent(this, SettingsActivity::class.java))
+            LaunchRouter.Action.CAPTURE -> {
+                val source = sourceName
+                    ?.let { name -> CaptureSource.entries.firstOrNull { it.name == name } }
+                    ?: CaptureSource.QUICK_TAP
+                CaptureService.instance
+                    ?.requestCapture(source, clampDelay(intent.getLongExtra(EXTRA_DELAY_MS, 0L)))
+            }
         }
         finish()
         @Suppress("DEPRECATION")

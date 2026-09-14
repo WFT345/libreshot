@@ -19,6 +19,7 @@
     <string name="session_gone">Screenshot is no longer available</string>
 
     <string name="settings">Settings</string>
+    <string name="shortcut_capture">Capture</string>
     <string name="settings_capture">Capture</string>
     <string name="settings_quick_tap">Set up Quick Tap</string>
     <string name="settings_quick_tap_summary">Stock Pixel only (GrapheneOS/AOSP don’t ship Quick Tap): Settings → System → Gestures → Quick Tap → Open app → LibreShot</string>
