@@ -21,7 +21,7 @@
     <string name="settings">Settings</string>
     <string name="settings_capture">Capture</string>
     <string name="settings_quick_tap">Set up Quick Tap</string>
-    <string name="settings_quick_tap_summary">Pixel only: Settings → System → Gestures → Quick Tap → Open app → LibreShot</string>
+    <string name="settings_quick_tap_summary">Stock Pixel only (GrapheneOS/AOSP don’t ship Quick Tap): Settings → System → Gestures → Quick Tap → Open app → LibreShot</string>
     <string name="settings_back_tap">Back-tap capture</string>
     <string name="settings_back_tap_summary">Double-tap the back of the phone. Uses the accelerometer only while the screen is on.</string>
     <string name="settings_volume_chord">Volume-key chord</string>
