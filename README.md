@@ -4,8 +4,8 @@ iOS-style screenshots for stock Android: capture, peek in the corner, mark up, c
 save - and nothing ever touches your gallery unless you say so.
 
 Built for GrapheneOS/Pixel (Quick Tap) and tested on Samsung One UI (Quick Settings
-tile). See `SnapShot_Spec.md` for the product spec and `DEVIATIONS.md` for where this
-MVP differs from it.
+tile). See `DEVIATIONS.md` for where this MVP differs from the original product
+spec (an internal document, not included in this repo).
 
 ## How it works
 
@@ -67,4 +67,4 @@ adb shell service call clipboard 2                            # inspect clipboar
 
 ## License
 
-MIT (pending team decision, spec §0).
+MIT (final license pending).
