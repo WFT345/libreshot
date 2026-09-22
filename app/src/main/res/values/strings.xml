@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">LibreShot</string>
     <string name="service_label">LibreShot capture</string>
-    <string name="service_description">Takes screenshots when you trigger them (Quick Tap or the Quick Settings tile) and keeps them in memory until you choose to save, copy, or share. It does not read screen content, keystrokes, or gestures.</string>
+    <string name="service_description">Takes screenshots when you trigger them (Quick Tap or the Quick Settings tile) and keeps them in memory until you choose to save, copy, or share. It does not read screen content. When the optional volume chord is on, key presses are watched only to spot the double-press - never stored or logged.</string>
 
     <string name="done">Done</string>
     <string name="share">Share</string>

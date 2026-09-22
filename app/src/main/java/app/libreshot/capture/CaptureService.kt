@@ -51,10 +51,7 @@ class CaptureService : AccessibilityService() {
         val overlay = ThumbnailOverlay(this)
         this.overlay = overlay
         backTapMonitor = BackTapMonitor(this) {
-            // Screenshot-on-lockscreen is deliberately excluded from back-tap.
-            if (getSystemService(KeyguardManager::class.java)?.isKeyguardLocked != true) {
-                requestCapture(CaptureSource.BACK_TAP)
-            }
+            requestCapture(CaptureSource.BACK_TAP)
         }
         scope.launch {
             Prefs.flow(this@CaptureService).collect { value ->
@@ -100,6 +97,8 @@ class CaptureService : AccessibilityService() {
     }
 
     private fun capture(source: CaptureSource) {
+        // No capture while locked, from any trigger - lock-screen content stays private.
+        if (getSystemService(KeyguardManager::class.java)?.isKeyguardLocked == true) return
         if (!rateLimiter.allow(SystemClock.uptimeMillis())) return
 
         val overlayWasShowing = overlay?.isShowing == true
