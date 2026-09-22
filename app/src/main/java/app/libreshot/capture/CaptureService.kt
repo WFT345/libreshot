@@ -42,6 +42,7 @@ class CaptureService : AccessibilityService() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val chordDetector = KeyChordDetector()
     private val rateLimiter = RateLimiter(windowMs = 400L)
+    private var consumingChordPress = false
     private var backTapMonitor: BackTapMonitor? = null
     private var overlay: ThumbnailOverlay? = null
     private var prefs = PrefsSnapshot()
@@ -83,13 +84,22 @@ class CaptureService : AccessibilityService() {
 
     override fun onKeyEvent(event: KeyEvent): Boolean {
         if (!prefs.volumeChord) return super.onKeyEvent(event)
+        // Tail of the press that fired: its repeats and key-up must not reach the volume UI.
+        if (event.keyCode == KeyEvent.KEYCODE_VOLUME_DOWN && consumingChordPress) {
+            if (event.action == KeyEvent.ACTION_UP) consumingChordPress = false
+            return true
+        }
         if (event.action == KeyEvent.ACTION_DOWN && event.repeatCount == 0 &&
             chordDetector.onKeyDown(event.keyCode, event.eventTime)
         ) {
             requestCapture(CaptureSource.CHORD)
+            consumingChordPress = true
+            return true
         }
-        // Swallow volume-down so the chord never changes volume; everything else passes.
-        return if (event.keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) true else super.onKeyEvent(event)
+        // A first press is indistinguishable from an ordinary one, so it still adjusts the
+        // volume; only the press that completes the chord is swallowed. Every key-down still
+        // reaches the detector, because a foreign key breaks a half-formed chord.
+        return super.onKeyEvent(event)
     }
 
     fun requestCapture(source: CaptureSource, delayMs: Long = 0L) {
@@ -126,6 +136,7 @@ class CaptureService : AccessibilityService() {
     }
 
     private fun applyKeyEventFilter() {
+        consumingChordPress = false
         val info = serviceInfo ?: return
         val enabled = info.flags and AccessibilityServiceInfo.FLAG_REQUEST_FILTER_KEY_EVENTS != 0
         if (enabled == prefs.volumeChord) return
