@@ -29,6 +29,11 @@ spec (an internal document, not included in this repo).
   content.
 - The optional back-tap trigger reads the accelerometer only while the screen is
   on and the toggle is enabled. No motion data is stored or leaves the process.
+- Anything that can launch the capture trampoline (it must be exported for Quick Tap
+  and the launcher) gets a *visible* capture at most: the flash/thumbnail or the
+  editor always appears, and the bitmap never leaves the process - no network
+  permission, no component that hands pixels out.
+- No capture fires while the device is locked, from any trigger.
 - No analytics, no crash SDKs, no Play Services.
 
 ## Setup
@@ -67,4 +72,4 @@ adb shell service call clipboard 2                            # inspect clipboar
 
 ## License
 
-MIT (final license pending).
+[GPL-3.0](LICENSE).
