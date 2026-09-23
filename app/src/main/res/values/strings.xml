@@ -24,7 +24,7 @@
     <string name="settings_quick_tap">Set up Quick Tap</string>
     <string name="settings_quick_tap_summary">Stock Pixel only (GrapheneOS/AOSP don’t ship Quick Tap): Settings → System → Gestures → Quick Tap → Open app → LibreShot</string>
     <string name="settings_back_tap">Back-tap capture</string>
-    <string name="settings_back_tap_summary">Double-tap the back of the phone. Uses the accelerometer only while the screen is on.</string>
+    <string name="settings_back_tap_summary">Double-tap the back of the phone. Uses the accelerometer only while the screen is on. Stray taps cost nothing, since unsaved captures never reach your gallery.</string>
     <string name="settings_back_tap_sensitivity">Tap strength needed</string>
     <string name="settings_sensitivity_high">Light</string>
     <string name="settings_sensitivity_medium">Firm</string>
@@ -43,7 +43,7 @@
     <string name="settings_skip_thumbnail">Open editor directly</string>
     <string name="settings_about">About</string>
     <string name="settings_version">Version</string>
-    <string name="settings_privacy">Privacy: no network permission, no analytics. Screenshots live in memory until you save, copy, or share. The optional back-tap trigger reads the accelerometer only while the screen is on.</string>
+    <string name="settings_privacy">Privacy: no network permission, no analytics. Screenshots live in memory until you save, copy, or share, so anything you do not keep is never written to your gallery. The optional back-tap trigger reads the accelerometer only while the screen is on.</string>
 
     <string name="onboarding_title">LibreShot</string>
     <string name="onboarding_tagline">iOS-style screenshots: peek, edit, copy, gone.</string>

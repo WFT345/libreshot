@@ -23,6 +23,11 @@ shot lands as a thumbnail in the corner, you glance at it, and it disappears unl
 act on it. Nothing is written to disk at capture time. The bitmap stays in memory until
 you choose Save, Copy, or Share.
 
+That is what makes an accidental capture harmless. A shot you did not mean to take is
+never written anywhere: it expires by itself after a few seconds and leaves no file
+behind. Your gallery only ever holds the screenshots you deliberately saved, so
+misfires cannot quietly pile up in your camera roll.
+
 It holds no permissions at all, has no network access, and ships no analytics.
 
 ## How it works
@@ -37,7 +42,7 @@ It holds no permissions at all, has no network access, and ships no analytics.
 <td><b>1. Trigger it.</b> Double tap the back of the phone, or use the Quick Settings
 tile. No system shutter animation, no notification.</td>
 <td><b>2. Peek.</b> The shot shrinks into the corner for six seconds. Swipe it away to
-discard, or ignore it and it discards itself.</td>
+discard, or ignore it and it discards itself. No file is written either way.</td>
 <td><b>3. Mark up.</b> Tap the thumbnail to open the editor, then save, copy, or throw
 it away.</td>
 </tr>
@@ -57,7 +62,7 @@ The back tap runs on a small accelerometer heuristic rather than a machine learn
 model: a z-dominant spike pair, 80 to 400 ms apart, with a one second cooldown. It
 costs no permissions and no native code, and it can be tuned between three sensitivity
 levels in Settings. A false trigger is cheap by design, since an unwanted capture just
-peeks and vanishes.
+peeks and vanishes without ever reaching your gallery.
 
 ## The editor
 
@@ -78,6 +83,8 @@ Capture goes through `AccessibilityService.takeScreenshot()`, which is worth
 understanding before you trust it. An accessibility service can be granted a lot of
 reach, so this one is declared as narrowly as the platform allows:
 
+- Captures are held in memory only. Nothing reaches storage unless you pick Save,
+  Copy, or Share, so an unintended trigger leaves nothing behind to clean up.
 - It requests `canTakeScreenshot`, and `canRequestFilterKeyEvents` only while the
   optional volume chord is switched on. It does **not** request
   `canRetrieveWindowContent`, so it cannot read what is on your screen.
