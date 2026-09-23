@@ -107,7 +107,7 @@ class CaptureService : AccessibilityService() {
     }
 
     private fun capture(source: CaptureSource) {
-        // No capture while locked, from any trigger - lock-screen content stays private.
+        // No capture while locked, from any trigger. Lock-screen content stays private.
         if (getSystemService(KeyguardManager::class.java)?.isKeyguardLocked == true) return
         if (!rateLimiter.allow(SystemClock.uptimeMillis())) return
 

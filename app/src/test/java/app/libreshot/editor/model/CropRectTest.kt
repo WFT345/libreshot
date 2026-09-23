@@ -37,7 +37,7 @@ class CropRectTest {
     }
 
     @Test
-    fun `handles never cross the opposite edge - min size is kept`() {
+    fun `handles never cross the opposite edge, min size is kept`() {
         val start = CropRect(0.4f, 0.4f, 0.6f, 0.6f)
         val squeezed = start.dragged(CropHandle.LEFT, 0.99f, 0.5f)
         assertEquals(start.right - CropRect.MIN_SIZE, squeezed.left)

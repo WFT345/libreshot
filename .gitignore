@@ -18,6 +18,10 @@ local.properties
 # Obsidian vault (separate from the repo; see wiki/LibreShot.md)
 wiki/
 
-# Signing - never commit real keys
+# Signing (never commit real keys)
 signing.properties
 *.keystore
+
+# Local engineering notes, kept out of the published source
+DEVIATIONS.md
+docs/

@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/assets/icon.png" width="120" alt="LibreShot">
+<img src="assets/icon.png" width="120" alt="LibreShot">
 
 # LibreShot
 
@@ -70,8 +70,7 @@ takes part in the undo timeline.
 Closing the editor opens the Done sheet: Save to Photos, Copy, Copy and Delete, or
 Delete Screenshot.
 
-Lasso, ruler, text, shapes, magnifier, and signature are not built yet. See
-[DEVIATIONS.md](DEVIATIONS.md) for the full list of what shipped and what did not.
+Lasso, ruler, text, shapes, magnifier, and signature are not built yet.
 
 ## Privacy
 
@@ -122,7 +121,7 @@ Android 13 (API 33) or newer.
 No published build yet, so compile it yourself:
 
 ```
-git clone https://github.com/wft345/libreshot.git
+git clone https://github.com/WFT345/libreshot.git
 cd libreshot
 ./gradlew installDebug
 ```

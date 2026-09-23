@@ -16,8 +16,8 @@ import app.libreshot.settings.PrefsSnapshot
 /**
  * Owns the accelerometer subscription for the back-tap trigger. Listens only while
  * [setEnabled] true AND the screen is interactive, so the sensor costs nothing idle.
- * Samples at 200 Hz - the fastest rate allowed without HIGH_SAMPLING_RATE_SENSORS -
- * which is enough for 10-30 ms tap transients; callbacks arrive on the registering
+ * Samples at 200 Hz, the fastest rate allowed without HIGH_SAMPLING_RATE_SENSORS, which
+ * is enough for 10 to 30 ms tap transients; callbacks arrive on the registering
  * (main) thread. [onTap] decides what a tap does.
  */
 class BackTapMonitor(

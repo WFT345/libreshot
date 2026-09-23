@@ -42,7 +42,7 @@ import kotlin.math.roundToInt
 private const val MAX_ZOOM = 4f
 
 /**
- * One finger draws with the active tool - unless the down lands on a crop handle, in which
+ * One finger draws with the active tool, unless the down lands on a crop handle, in which
  * case it drags the crop rect. Two fingers always pan/zoom (cancelling any stroke or crop
  * drag in progress), three-finger horizontal swipe is undo/redo.
  */

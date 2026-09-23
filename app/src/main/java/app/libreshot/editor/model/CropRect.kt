@@ -29,7 +29,7 @@ data class CropRect(
 
     /**
      * Copy with [handle] moved to ([x], [y]) in normalized space. The dragged edge(s) clamp
-     * to [0, 1] and never cross the opposite edge - the rect keeps at least [minSize].
+     * to [0, 1] and never cross the opposite edge. The rect keeps at least [minSize].
      */
     fun dragged(handle: CropHandle, x: Float, y: Float, minSize: Float = MIN_SIZE): CropRect {
         val cx = x.coerceIn(0f, 1f)
